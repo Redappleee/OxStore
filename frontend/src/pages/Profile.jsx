@@ -219,7 +219,7 @@ function TabOrders() {
       <h2 style={S.tabTitle}>Order history</h2>
       {orders.map(o => (
         <article key={o._id} style={S.orderCard}>
-          <button style={S.orderHead} onClick={() => setOpen(open === o._id ? null : o._id)}>
+          <button className="profile-order-head" style={S.orderHead} onClick={() => setOpen(open === o._id ? null : o._id)}>
             <div>
               <span style={{ fontWeight: 600, fontSize: 13 }}>#{o._id.slice(-7).toUpperCase()}</span>
               <small style={S.muted}> · {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {o.items.length} item(s)</small>
@@ -328,7 +328,7 @@ function TabAddresses() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
+      <div className="profile-section-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
         <h2 style={{ ...S.tabTitle, margin: 0 }}>Saved addresses</h2>
         <button className="button" onClick={openNew} style={{ padding: '10px 18px', fontSize: 13 }}>+ Add address</button>
       </div>

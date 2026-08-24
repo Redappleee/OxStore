@@ -122,6 +122,9 @@
   .profile-wishlist-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;width:100%!important}
   .profile-addr-card{flex-direction:column!important;gap:12px!important;width:100%!important;box-sizing:border-box!important}
   .profile-addr-actions{flex-direction:row!important;gap:14px!important;align-self:flex-start!important}
+  .profile-section-head{flex-wrap:wrap!important;gap:12px!important;align-items:center!important}
+  .profile-order-head{flex-direction:column!important;align-items:flex-start!important;gap:10px!important;padding:14px 12px!important}
+  .profile-order-head>div{width:100%!important;justify-content:space-between!important}
   .mega-menu-card{position:fixed;top:115px;left:4vw;right:4vw;width:auto;max-width:none;padding:16px;box-shadow:0 15px 40px rgba(0,0,0,0.18)}
   .mega-menu-cols{grid-template-columns:1fr;gap:16px}
   .mega-menu-col-featured{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:14px}
