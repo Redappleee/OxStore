@@ -6,6 +6,46 @@ import { useWishlist } from '../context/WishlistContext';
 import OrderTimeline from '../components/OrderTimeline';
 import ProductCard from '../components/ProductCard';
 
+/* ─── VECTOR ICONS (No Emojis) ─────────────────────────────── */
+const Icons = {
+  account: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+  ),
+  orders: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  ),
+  wishlist: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+  ),
+  addresses: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+    </svg>
+  ),
+  security: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  ),
+  logout: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  ),
+  camera: (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+    </svg>
+  )
+};
+
 /* ─── Avatar ─────────────────────────────────────────────── */
 function Avatar({ name, src, size = 72, onUpload }) {
   const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -41,12 +81,13 @@ function Avatar({ name, src, size = 72, onUpload }) {
       {onUpload !== undefined && (
         <label style={{
           position: 'absolute', bottom: 0, right: 0,
-          width: 24, height: 24, borderRadius: '50%',
+          width: 26, height: 26, borderRadius: '50%',
           background: 'var(--ink)', color: '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', fontSize: 12, border: '2px solid var(--paper)',
+          cursor: 'pointer', border: '2px solid var(--paper)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
         }} title="Change photo">
-          {uploading ? '⏳' : '📷'}
+          {uploading ? <span style={{ fontSize: 10 }}>...</span> : Icons.camera}
           <input type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
         </label>
       )}
@@ -54,12 +95,11 @@ function Avatar({ name, src, size = 72, onUpload }) {
   );
 }
 
-
 /* ─── Section message helper ─────────────────────────────── */
 function Msg({ text, ok }) {
   if (!text) return null;
   return (
-    <p style={{ fontSize: 13, margin: '14px 0 0', color: ok ? '#2e7d32' : '#c0392b' }}>
+    <p style={{ fontSize: 13, margin: '14px 0 0', color: ok ? '#2e7d32' : '#c0392b', fontWeight: 500 }}>
       {ok ? '✓ ' : ''}{text}
     </p>
   );
@@ -165,11 +205,12 @@ function TabOrders() {
     api.get('/orders').then(r => setOrders(r.data.orders)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p style={{ color: 'var(--muted)' }}>Loading orders…</p>;
+  if (loading) return <p style={{ color: 'var(--muted)', fontSize: 13 }}>Loading orders…</p>;
   if (!orders.length) return (
     <div style={S.empty}>
-      <span style={{ fontSize: 36 }}>📦</span>
-      <p>No orders yet. <Link to="/shop" style={{ textDecoration: 'underline' }}>Shop the collection →</Link></p>
+      <div style={S.emptyIcon}>{Icons.orders}</div>
+      <p style={{ margin: '8px 0 0', fontWeight: 500 }}>No orders placed yet.</p>
+      <Link to="/shop" style={{ fontSize: 13, textDecoration: 'underline', color: 'var(--muted)' }}>Shop the collection →</Link>
     </div>
   );
 
@@ -186,7 +227,7 @@ function TabOrders() {
             <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
               <span style={{ ...S.statusBadge, background: STATUS_COLOR[o.status] || '#edeae4' }}>{o.status}</span>
               <strong style={{ fontSize: 15 }}>{inr(o.amount)}</strong>
-              <span style={{ fontSize: 12, color: 'var(--muted)' }}>{open === o._id ? '▲' : '▼'}</span>
+              <span style={{ fontSize: 11, color: 'var(--muted)' }}>{open === o._id ? '▲' : '▼'}</span>
             </div>
           </button>
           {open === o._id && (
@@ -225,8 +266,9 @@ function TabWishlist() {
   const items = wishlist.products || [];
   if (!items.length) return (
     <div style={S.empty}>
-      <span style={{ fontSize: 36 }}>♡</span>
-      <p>Nothing saved yet. <Link to="/shop" style={{ textDecoration: 'underline' }}>Explore the collection →</Link></p>
+      <div style={S.emptyIcon}>{Icons.wishlist}</div>
+      <p style={{ margin: '8px 0 0', fontWeight: 500 }}>Nothing saved yet.</p>
+      <Link to="/shop" style={{ fontSize: 13, textDecoration: 'underline', color: 'var(--muted)' }}>Explore the collection →</Link>
     </div>
   );
   return (
@@ -246,7 +288,7 @@ function TabAddresses() {
   const STORE_KEY = 'oxstore_addresses';
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch { return []; } };
   const [addresses, setAddresses] = useState(load);
-  const [editing, setEditing] = useState(null); // null | 'new' | index
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(ADDR_BLANK);
 
   const persist = list => { setAddresses(list); localStorage.setItem(STORE_KEY, JSON.stringify(list)); };
@@ -278,7 +320,7 @@ function TabAddresses() {
         <Field label="Country" value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} />
         <div style={{ gridColumn: '1/-1', display: 'flex', gap: 12 }}>
           <button className="button" style={{ flex: 1 }}>Save address</button>
-          <button type="button" className="button" onClick={() => setEditing(null)} style={{ flex: 1, background: 'transparent', color: 'var(--ink)', border: '1px solid var(--line)' }}>Cancel</button>
+          <button type="button" className="button light" onClick={() => setEditing(null)} style={{ flex: 1 }}>Cancel</button>
         </div>
       </form>
     </div>
@@ -370,10 +412,10 @@ function TabSecurity({ user, setUser }) {
         <div>
           <p style={{ margin: 0, fontWeight: 600 }}>Email verification</p>
           <p style={{ ...S.muted, margin: '4px 0 0', fontSize: 13 }}>
-            {user?.isVerified ? '✓ Your email is verified.' : '⚠ Your email is not yet verified.'}
+            {user?.isVerified ? 'Your email address is verified.' : 'Your email address requires verification.'}
           </p>
         </div>
-        <span style={{ fontSize: 20 }}>{user?.isVerified ? '🔒' : '⚠️'}</span>
+        <span style={S.statusTag}>{user?.isVerified ? 'VERIFIED' : 'UNVERIFIED'}</span>
       </div>
 
       {/* Member since */}
@@ -411,11 +453,11 @@ function TabSecurity({ user, setUser }) {
 
 /* ─── TABS CONFIG ────────────────────────────────────────── */
 const TABS = [
-  { id: 'account', label: 'Account', icon: '👤' },
-  { id: 'orders',  label: 'Orders',  icon: '📦' },
-  { id: 'wishlist',label: 'Wishlist',icon: '♡'  },
-  { id: 'addresses',label:'Addresses',icon: '📍'},
-  { id: 'security',label: 'Security',icon: '🔒' },
+  { id: 'account', label: 'Account', icon: Icons.account },
+  { id: 'orders',  label: 'Orders',  icon: Icons.orders },
+  { id: 'wishlist',label: 'Wishlist',icon: Icons.wishlist },
+  { id: 'addresses',label:'Addresses',icon: Icons.addresses },
+  { id: 'security',label: 'Security',icon: Icons.security },
 ];
 
 /* ─── MAIN PROFILE ───────────────────────────────────────── */
@@ -424,7 +466,6 @@ export default function Profile({ user, setUser }) {
   const [fullUser, setFullUser] = useState(user);
   const nav = useNavigate();
 
-  // Fetch extended user info (phone, createdAt, sessionCount)
   useEffect(() => {
     api.get('/auth/me').then(r => setFullUser(r.data.user)).catch(() => {});
   }, []);
@@ -453,7 +494,7 @@ export default function Profile({ user, setUser }) {
           <div className="profile-sidebar-user-info" style={{ marginTop: 14 }}>
             <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>{fullUser?.name}</p>
             <p style={{ ...S.muted, margin: '3px 0 0', fontSize: 12 }}>{fullUser?.email}</p>
-            {fullUser?.isVerified && <span style={S.verifiedPill}>✓ Verified</span>}
+            {fullUser?.isVerified && <span style={S.verifiedPill}>VERIFIED MEMBER</span>}
           </div>
         </div>
 
@@ -463,7 +504,7 @@ export default function Profile({ user, setUser }) {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`profile-tab-btn${tab === t.id ? ' active' : ''}`}>
-              <span style={{ fontSize: 16 }}>{t.icon}</span>
+              <span className="profile-tab-icon">{t.icon}</span>
               {t.label}
             </button>
           ))}
@@ -477,9 +518,9 @@ export default function Profile({ user, setUser }) {
               width: '100%', textAlign: 'left',
               background: 'transparent', border: 'none',
               padding: '10px 12px', fontSize: 14,
-              cursor: 'pointer', color: '#c0392b',
+              cursor: 'pointer', color: '#c0392b', fontWeight: 500
             }}>
-            <span style={{ fontSize: 16 }}>↪</span>
+            {Icons.logout}
             Sign out
           </button>
         </div>
@@ -563,10 +604,17 @@ const S = {
   muted: { color: 'var(--muted)', margin: 0 },
   verifiedPill: {
     display: 'inline-block', marginTop: 6,
-    background: '#e8f5e9', color: '#2e7d32',
-    fontSize: 10, padding: '2px 8px',
+    background: '#171513', color: '#fff',
+    fontSize: 9, padding: '3px 8px', borderRadius: 2,
     fontFamily: "'DM Mono', monospace",
-    letterSpacing: '0.5px',
+    letterSpacing: '0.8px',
+  },
+  statusTag: {
+    display: 'inline-block',
+    background: '#edeae4', color: 'var(--ink)',
+    fontSize: 10, padding: '3px 8px', borderRadius: 2,
+    fontFamily: "'DM Mono', monospace",
+    letterSpacing: '0.8px', fontWeight: 600
   },
   orderCard: {
     border: '1px solid var(--line)',
@@ -626,4 +674,9 @@ const S = {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', gap: 12,
   },
+  emptyIcon: {
+    width: 52, height: 52, borderRadius: '50%',
+    background: '#edeae4', color: 'var(--ink)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }
 };
