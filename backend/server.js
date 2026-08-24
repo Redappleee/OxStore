@@ -9,7 +9,16 @@ app.use((req,res)=>res.status(404).json({message:'Route not found'}));
 app.use((err,req,res,next)=>{console.error(err);res.status(err.status||500).json({message:err.message||'Internal server error'})});
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server listening on port ${PORT}`);
   connect().catch(e => console.error('MongoDB connection error:', e));
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Graceful shutdown.');
+  server.close(() => process.exit(0));
+});
+process.on('SIGINT', () => {
+  console.log('SIGINT received. Graceful shutdown.');
+  server.close(() => process.exit(0));
 });
