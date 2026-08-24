@@ -69,5 +69,86 @@
 .nav-avatar-link:hover{transform:scale(1.08)}
 .nav-avatar-img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid var(--ink);display:block;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:800px){header{height:auto;grid-template-columns:1fr auto;padding:15px 5vw;gap:13px}.search-pill-container{grid-row:2;grid-column:1/-1}nav{gap:14px;font-size:13px}.hero{min-height:570px;padding:8vw}.hero h1{letter-spacing:-3px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.section{padding:42px 5vw}.filters{flex-wrap:wrap;gap:12px}.filters>*{max-width:none;width:calc(50% - 6px)}.filters input{width:100%}.product-detail{display:block;padding:15px 0 50px}.gallery{gap:2px}.product-detail aside{position:static;padding:35px 5vw}.reviews{padding:0 5vw}.bag-item{grid-template-columns:70px 1fr 55px}.bag-item img{width:70px;height:90px}.bag-item>.link{display:none}.checkout form{display:block}.payment{margin-top:45px}.stats{grid-template-columns:1fr 1fr}.product-form{grid-template-columns:1fr}.product-form .button{width:100%}.section h1{font-size:39px}.auth{margin:40px auto}.profile-page{grid-template-columns:1fr}.profile-sidebar{position:static;min-height:auto;border-right:none;border-bottom:1px solid var(--line);padding:20px 5vw}.profile-tab-nav{flex-direction:row;flex-wrap:wrap;gap:4px}.profile-tab-btn{width:auto;padding:8px 12px;font-size:13px}.profile-content{padding:28px 5vw 60px}}
+/* ─── RESPONSIVE SYSTEM (All Display Sizes) ─────────────────────── */
+
+/* 1. Laptops & Mid-Desktops (769px - 1024px) */
+@media(max-width:1024px){
+  .luxury-header{padding:0 3vw;gap:20px;grid-template-columns:180px minmax(200px,360px) 1fr}
+  .grid{grid-template-columns:repeat(3,1fr);gap:14px}
+  .product-detail{grid-template-columns:1.1fr 0.9fr;gap:24px;padding:24px 3vw 60px}
+  .profile-page{grid-template-columns:220px 1fr}
+  .profile-sidebar{padding:32px 20px}
+  .profile-content{padding:32px 32px 60px}
+  .mega-menu-card{width:480px;right:-40px;padding:18px}
+}
+
+/* 2. Tablets & Foldables (481px - 768px) */
+@media(max-width:768px){
+  header,.luxury-header{height:auto;grid-template-columns:1fr auto;padding:14px 4vw;gap:12px}
+  .search-pill-container{grid-row:2;grid-column:1/-1;width:100%}
+  nav,.luxury-nav{gap:14px;font-size:13px}
+  .hero{min-height:480px;padding:6vw}
+  .hero h1{font-size:clamp(40px,7vw,70px);letter-spacing:-3px;margin:10px 0 24px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .section{padding:40px 4vw}
+  .section h1{font-size:36px}
+  .filters{flex-wrap:wrap;gap:10px}
+  .filters>*{max-width:none;width:calc(50% - 5px)}
+  .product-detail{display:block;padding:20px 4vw 50px}
+  .gallery{gap:8px}
+  .product-detail aside{position:static;padding:24px 0}
+  .reviews{padding:0}
+  .bag-item{grid-template-columns:75px 1fr 60px;gap:12px}
+  .bag-item img{width:75px;height:95px}
+  .checkout form{display:block}
+  .payment{margin-top:35px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .product-form{grid-template-columns:1fr}
+  .product-form .button{width:100%}
+  .auth{margin:30px auto;padding:0 20px}
+  .profile-page{grid-template-columns:1fr}
+  .profile-sidebar{position:static;min-height:auto;border-right:none;border-bottom:1px solid var(--line);padding:16px 4vw}
+  .profile-tab-nav{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;gap:4px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .profile-tab-nav::-webkit-scrollbar{display:none}
+  .profile-tab-btn{flex-shrink:0;width:auto;padding:8px 12px;font-size:13px}
+  .profile-content{padding:24px 4vw 60px}
+  .profile-grid2{grid-template-columns:1fr;gap:14px}
+  .mega-menu-card{position:fixed;top:115px;left:4vw;right:4vw;width:auto;max-width:none;padding:16px;box-shadow:0 15px 40px rgba(0,0,0,0.18)}
+  .mega-menu-cols{grid-template-columns:1fr;gap:16px}
+  .mega-menu-col-featured{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:14px}
+}
+
+/* 3. Small Smartphones & Compact Displays (<= 480px) */
+@media(max-width:480px){
+  .announcement-banner{font-size:10px;padding:6px 3vw}
+  .banner-content{font-size:10px}
+  .brand{font-size:20px}
+  header,.luxury-header{padding:10px 3.5vw;gap:10px}
+  nav,.luxury-nav{gap:10px;font-size:12px}
+  .hero{min-height:420px;padding:6vw 4vw}
+  .hero h1{font-size:38px;letter-spacing:-2px;margin:8px 0 18px}
+  .hero p{font-size:10px}
+  .section{padding:30px 3.5vw}
+  .section h1{font-size:28px;margin-bottom:20px}
+  .section h2{font-size:22px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .card-copy h3{font-size:12px;margin-bottom:4px}
+  .card-copy strong,.card-copy del{font-size:12px}
+  .filters>*{width:100%}
+  .product-detail h1{font-size:28px}
+  .price{font-size:16px}
+  .choices button{padding:6px 9px;font-size:11px}
+  .bag-item{grid-template-columns:65px 1fr 50px;gap:10px;padding:12px 0}
+  .bag-item img{width:65px;height:82px}
+  .bag-item h3{font-size:13px}
+  .summary{max-width:100%;margin-top:20px}
+  .button{padding:12px 16px;font-size:13px}
+  .auth h1{font-size:30px}
+  .stats{grid-template-columns:1fr;gap:8px}
+  .stats div{padding:16px}
+  .stats b{font-size:22px}
+  .spotlight-card{padding:14px}
+  .spotlight-card h4{font-size:14px}
+  footer{padding:18px 4vw;flex-direction:column;gap:8px;text-align:center}
+}
+
