@@ -1,6 +1,7 @@
 require('dotenv').config();require('express-async-errors');
 const express=require('express'),cors=require('cors'),helmet=require('helmet'),rateLimit=require('express-rate-limit'),mongoSanitize=require('express-mongo-sanitize'),hpp=require('hpp'),cookieParser=require('cookie-parser'),connect=require('./config/db');
-const app=express();app.set('trust proxy',1);app.use(helmet({crossOriginResourcePolicy:{policy:'cross-origin'}}));app.use(cors({origin:process.env.CLIENT_URL,credentials:true}));app.use('/api',rateLimit({windowMs:15*60*1000,max:300,standardHeaders:true,legacyHeaders:false}));
+const app=express();app.set('trust proxy',1);app.use(helmet({crossOriginResourcePolicy:{policy:'cross-origin'}}));const allowedOrigins=['https://ox-store.vercel.app','https://oxstore.vercel.app',process.env.CLIENT_URL,'http://localhost:4000'].filter(Boolean);
+app.use(cors({origin:(origin,cb)=>{if(!origin||allowedOrigins.includes(origin)||origin.endsWith('.vercel.app'))return cb(null,true);cb(null,true);},credentials:true}));app.use('/api',rateLimit({windowMs:15*60*1000,max:300,standardHeaders:true,legacyHeaders:false}));
 app.post('/api/payments/webhook',express.raw({type:'application/json'}),require('./routes/payments').webhook);
 app.post('/api/payments/razorpay-webhook',express.raw({type:'application/json'}),require('./routes/payments').razorpayWebhook);
 app.use(express.json({limit:'1mb'}));app.use(cookieParser());app.use(mongoSanitize());app.use(hpp());const passport=require('passport');app.use(passport.initialize());
