@@ -1,0 +1,26 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports: ["27017:27017"]
+    volumes: [mongo_data:/data/db]
+  backend:
+    build: ./backend
+    command: npm run dev
+    ports: ["5001:5001"]
+    env_file: ./backend/.env
+    environment:
+      MONGO_URI: mongodb://mongo:27017/oxstore
+      CLIENT_URL: http://localhost:4000
+      PORT: 5001
+    volumes: [./backend:/app, /app/node_modules]
+    depends_on: [mongo]
+  frontend:
+    build: ./frontend
+    command: npm start
+    ports: ["4000:4000"]
+    environment: [CHOKIDAR_USEPOLLING=true, PORT=4000]
+    volumes: [./frontend:/app, /app/node_modules]
+    depends_on: [backend]
+volumes:
+  mongo_data:

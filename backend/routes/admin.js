@@ -1,0 +1,5 @@
+const router=require('express').Router(),Order=require('../models/Order'),Product=require('../models/Product'),User=require('../models/User'),{protect,admin}=require('../middleware/auth');
+router.use(protect,admin);
+router.get('/stats',async(req,res)=>{const [orders,users,products,revenue]=await Promise.all([Order.countDocuments(),User.countDocuments(),Product.countDocuments(),Order.aggregate([{$match:{paymentStatus:'paid'}},{$group:{_id:null,total:{$sum:'$amount'}}}])]);res.json({orders,users,products,revenue:revenue[0]?.total||0})});
+router.get('/orders',async(req,res)=>res.json({orders:await Order.find().populate('user','name email').sort('-createdAt').limit(100)}));
+router.patch('/orders/:id/status',async(req,res)=>{const statuses=['processing','confirmed','shipped','delivered','cancelled'];if(!statuses.includes(req.body.status))return res.status(400).json({message:'Invalid status'});const order=await Order.findByIdAndUpdate(req.params.id,{$set:{status:req.body.status},$push:{timeline:{status:req.body.status,note:req.body.note||''}}},{new:true});res.json({order})});module.exports=router;

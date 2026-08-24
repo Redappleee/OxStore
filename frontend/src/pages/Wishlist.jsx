@@ -1,0 +1,2 @@
+import ProductCard from '../components/ProductCard';import {useWishlist} from '../context/WishlistContext';
+export default function Wishlist(){const {wishlist}=useWishlist();return <main className="section"><h1>Saved pieces</h1><div className="grid">{wishlist.products?.map(p=><ProductCard product={p} key={p._id}/>)}</div>{!wishlist.products?.length&&<p className="empty">Your saved collection is empty.</p>}</main>}

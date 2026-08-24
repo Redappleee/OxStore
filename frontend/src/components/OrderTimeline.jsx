@@ -1,0 +1,1 @@
+export default function OrderTimeline({timeline=[]}){return <div className="timeline">{timeline.map((t,i)=><div key={i}><i/> <b>{t.status}</b><small>{new Date(t.at).toLocaleString()} {t.note&&`— ${t.note}`}</small></div>)}</div>}
