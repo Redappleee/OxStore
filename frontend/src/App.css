@@ -107,12 +107,18 @@
   .product-form .button{width:100%}
   .auth{margin:30px auto;padding:0 20px}
   .profile-page{grid-template-columns:1fr}
-  .profile-sidebar{position:static;min-height:auto;border-right:none;border-bottom:1px solid var(--line);padding:16px 4vw}
-  .profile-tab-nav{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;gap:4px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .profile-sidebar{position:static;min-height:auto;border-right:none;border-bottom:1px solid var(--line);padding:20px 4vw}
+  .profile-sidebar-top{display:flex!important;align-items:center!important;gap:16px!important;padding-bottom:16px!important;margin-bottom:16px!important;border-bottom:1px solid var(--line)!important}
+  .profile-sidebar-user-info{margin-top:0!important}
+  .profile-tab-nav{flex-direction:row!important;overflow-x:auto!important;flex-wrap:nowrap!important;gap:6px!important;padding-bottom:4px!important;-webkit-overflow-scrolling:touch}
   .profile-tab-nav::-webkit-scrollbar{display:none}
-  .profile-tab-btn{flex-shrink:0;width:auto;padding:8px 12px;font-size:13px}
+  .profile-tab-btn{flex-shrink:0!important;width:auto!important;padding:8px 14px!important;font-size:13px!important;border-radius:20px!important;background:var(--paper)!important;border:1px solid var(--line)!important}
+  .profile-tab-btn.active{background:var(--ink)!important;color:#fff!important;border-color:var(--ink)!important}
+  .profile-signout-container{margin-top:16px!important;padding-top:16px!important;border-top:1px solid var(--line)!important}
   .profile-content{padding:24px 4vw 60px}
-  .profile-grid2{grid-template-columns:1fr;gap:14px}
+  .profile-grid2{grid-template-columns:1fr!important;gap:16px!important}
+  .profile-sec-card{grid-template-columns:1fr!important;gap:12px!important}
+  .profile-sec-card button{width:100%!important}
   .mega-menu-card{position:fixed;top:115px;left:4vw;right:4vw;width:auto;max-width:none;padding:16px;box-shadow:0 15px 40px rgba(0,0,0,0.18)}
   .mega-menu-cols{grid-template-columns:1fr;gap:16px}
   .mega-menu-col-featured{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:14px}

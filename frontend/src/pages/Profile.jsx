@@ -98,7 +98,7 @@ function TabAccount({ user, setUser }) {
   return (
     <div>
       <h2 style={S.tabTitle}>Account details</h2>
-      <form onSubmit={save} style={S.grid2}>
+      <form onSubmit={save} className="profile-grid2">
         <Field label="Full name" value={name} onChange={e => setName(e.target.value)} required />
         <Field label="Email address" value={user?.email || ''} disabled />
         <Field label="Phone number" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 00000 00000" style={{ gridColumn: '1/-1', ...S.input }} />
@@ -137,7 +137,7 @@ function ChangePassword({ setUser }) {
   return (
     <>
       <h3 style={{ ...S.tabTitle, fontSize: 18, marginBottom: 20 }}>Change password</h3>
-      <form onSubmit={submit} style={S.grid2}>
+      <form onSubmit={submit} className="profile-grid2">
         <div style={{ gridColumn: '1/-1' }}>
           <Field label="Current password" type="password" value={form.currentPassword}
             onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))} required />
@@ -266,7 +266,7 @@ function TabAddresses() {
     <div>
       <button className="link" onClick={() => setEditing(null)} style={{ fontSize: 13, marginBottom: 20 }}>← Back</button>
       <h2 style={S.tabTitle}>{editing === 'new' ? 'Add address' : 'Edit address'}</h2>
-      <form onSubmit={save} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>
+      <form onSubmit={save} className="profile-grid2">
         <div style={{ gridColumn: '1/-1' }}><Field label="Label (e.g. Home, Office)" value={form.label} onChange={e => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Home" /></div>
         <Field label="Full name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
         <Field label="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
@@ -356,7 +356,7 @@ function TabSecurity({ user, setUser }) {
       <h2 style={S.tabTitle}>Security</h2>
 
       {/* Sessions */}
-      <div style={S.secCard}>
+      <div className="profile-sec-card" style={S.secCard}>
         <div>
           <p style={{ margin: 0, fontWeight: 600 }}>Active sessions</p>
           <p style={{ ...S.muted, margin: '4px 0 0', fontSize: 13 }}>You are currently signed in on {sessions} device(s).</p>
@@ -366,7 +366,7 @@ function TabSecurity({ user, setUser }) {
       </div>
 
       {/* Account verification badge */}
-      <div style={{ ...S.secCard, marginTop: 12 }}>
+      <div className="profile-sec-card" style={{ ...S.secCard, marginTop: 12 }}>
         <div>
           <p style={{ margin: 0, fontWeight: 600 }}>Email verification</p>
           <p style={{ ...S.muted, margin: '4px 0 0', fontSize: 13 }}>
@@ -377,7 +377,7 @@ function TabSecurity({ user, setUser }) {
       </div>
 
       {/* Member since */}
-      <div style={{ ...S.secCard, marginTop: 12 }}>
+      <div className="profile-sec-card" style={{ ...S.secCard, marginTop: 12 }}>
         <div>
           <p style={{ margin: 0, fontWeight: 600 }}>Member since</p>
           <p style={{ ...S.muted, margin: '4px 0 0', fontSize: 13 }}>
@@ -399,11 +399,11 @@ function TabSecurity({ user, setUser }) {
               <div style={{ flex: 1, minWidth: 200 }}>
                 <Field label="Confirm your password to delete" type="password" value={delPass} onChange={e => setDelPass(e.target.value)} required />
               </div>
-              <button className="button" disabled={busy} style={{ background: '#b91c1c', borderColor: '#b91c1c' }}>{busy ? 'Deleting…' : 'Confirm delete'}</button>
-              <button type="button" className="button" onClick={() => setDelConfirm(false)} style={{ background: 'transparent', color: 'var(--ink)', border: '1px solid var(--line)' }}>Cancel</button>
-              <Msg {...delMsg} />
+              <button className="button" disabled={busy} style={{ background: '#b91c1c', borderColor: '#b91c1c' }}>Confirm delete</button>
+              <button type="button" className="button light" onClick={() => setDelConfirm(false)}>Cancel</button>
             </form>
           )}
+        <Msg {...delMsg} />
       </div>
     </div>
   );
@@ -448,9 +448,9 @@ export default function Profile({ user, setUser }) {
     <main className="profile-page">
       {/* ── Sidebar ── */}
       <aside className="profile-sidebar">
-        <div style={S.sidebarTop}>
+        <div className="profile-sidebar-top" style={S.sidebarTop}>
           <Avatar name={fullUser?.name} src={fullUser?.avatar} size={72} onUpload={url => updateUser({ avatar: url })} />
-          <div style={{ marginTop: 14 }}>
+          <div className="profile-sidebar-user-info" style={{ marginTop: 14 }}>
             <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>{fullUser?.name}</p>
             <p style={{ ...S.muted, margin: '3px 0 0', fontSize: 12 }}>{fullUser?.email}</p>
             {fullUser?.isVerified && <span style={S.verifiedPill}>✓ Verified</span>}
@@ -469,7 +469,7 @@ export default function Profile({ user, setUser }) {
           ))}
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: 32, borderTop: '1px solid var(--line)' }}>
+        <div className="profile-signout-container" style={{ marginTop: 'auto', paddingTop: 32, borderTop: '1px solid var(--line)' }}>
           <button
             onClick={logout}
             style={{
