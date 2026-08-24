@@ -120,6 +120,7 @@
 
 /* 3. Small Smartphones & Compact Displays (<= 480px) */
 @media(max-width:480px){
+  input,select,textarea{font-size:16px!important} /* Prevents iOS Safari auto-zoom on focus */
   .announcement-banner{font-size:10px;padding:6px 3vw}
   .banner-content{font-size:10px}
   .brand{font-size:20px}
@@ -138,6 +139,8 @@
   .product-detail h1{font-size:28px}
   .price{font-size:16px}
   .choices button{padding:6px 9px;font-size:11px}
+  .review-form{grid-template-columns:1fr;gap:10px}
+  .review-form button{width:100%}
   .bag-item{grid-template-columns:65px 1fr 50px;gap:10px;padding:12px 0}
   .bag-item img{width:65px;height:82px}
   .bag-item h3{font-size:13px}
@@ -147,6 +150,7 @@
   .stats{grid-template-columns:1fr;gap:8px}
   .stats div{padding:16px}
   .stats b{font-size:22px}
+  .admin-orders>div,.admin-products>div{flex-wrap:wrap;gap:8px}
   .spotlight-card{padding:14px}
   .spotlight-card h4{font-size:14px}
   footer{padding:18px 4vw;flex-direction:column;gap:8px;text-align:center}
