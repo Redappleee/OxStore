@@ -5,7 +5,25 @@ app.use(cors({origin:(origin,cb)=>{if(!origin||allowedOrigins.includes(origin)||
 app.post('/api/payments/webhook',express.raw({type:'application/json'}),require('./routes/payments').webhook);
 app.post('/api/payments/razorpay-webhook',express.raw({type:'application/json'}),require('./routes/payments').razorpayWebhook);
 app.use(express.json({limit:'1mb'}));app.use(cookieParser());app.use(mongoSanitize());app.use(hpp());const passport=require('passport');app.use(passport.initialize());
-app.get('/',(req,res)=>res.json({name:'OxStore API',status:'online',version:'1.0.0',health:'/api/health'}));app.get('/api/health',(req,res)=>res.json({ok:true}));app.use('/api/auth',require('./routes/auth'));app.use('/api/products',require('./routes/products'));app.use('/api/cart',require('./routes/cart'));app.use('/api/wishlist',require('./routes/wishlist'));app.use('/api/reviews',require('./routes/reviews'));app.use('/api/orders',require('./routes/orders'));app.use('/api/payments',require('./routes/payments').router);app.use('/api/admin',require('./routes/admin'));
+app.get('/',(req,res)=>res.json({name:'OxStore API',status:'online',version:'1.0.0',health:'/api/health'}));
+app.get('/health',(req,res)=>res.json({ok:true}));
+app.get('/api/health',(req,res)=>res.json({ok:true}));
+
+const routes=[
+  ['/auth',require('./routes/auth')],
+  ['/products',require('./routes/products')],
+  ['/cart',require('./routes/cart')],
+  ['/wishlist',require('./routes/wishlist')],
+  ['/reviews',require('./routes/reviews')],
+  ['/orders',require('./routes/orders')],
+  ['/payments',require('./routes/payments').router],
+  ['/admin',require('./routes/admin')]
+];
+
+routes.forEach(([path,router])=>{
+  app.use(`/api${path}`,router);
+  app.use(path,router);
+});
 app.use((req,res)=>res.status(404).json({message:'Route not found'}));
 app.use((err,req,res,next)=>{console.error(err);res.status(err.status||500).json({message:err.message||'Internal server error'})});
 
