@@ -274,7 +274,7 @@ function TabWishlist() {
   return (
     <div>
       <h2 style={S.tabTitle}>Saved pieces ({items.length})</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 16 }}>
+      <div className="profile-wishlist-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 16 }}>
         {items.map(p => <ProductCard key={p._id} product={p} />)}
       </div>
     </div>
@@ -335,7 +335,7 @@ function TabAddresses() {
       {!addresses.length && <div style={S.empty}><p style={{ color: 'var(--muted)' }}>No addresses saved yet.</p></div>}
       <div style={{ display: 'grid', gap: 12 }}>
         {addresses.map((a, i) => (
-          <div key={i} style={{ ...S.addrCard, outline: a.isDefault ? '2px solid var(--ink)' : 'none' }}>
+          <div key={i} className="profile-addr-card" style={{ ...S.addrCard, outline: a.isDefault ? '2px solid var(--ink)' : 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
                 {a.label && <span style={S.addrLabel}>{a.label}</span>}
@@ -347,7 +347,7 @@ function TabAddresses() {
               </p>
               {a.phone && <p style={{ ...S.muted, margin: '3px 0 0', fontSize: 12 }}>{a.phone}</p>}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+            <div className="profile-addr-actions" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
               <button className="link" style={{ fontSize: 12 }} onClick={() => openEdit(i)}>Edit</button>
               {!a.isDefault && <button className="link" style={{ fontSize: 12 }} onClick={() => setDefault(i)}>Set default</button>}
               <button className="link" style={{ fontSize: 12, color: '#c0392b' }} onClick={() => remove(i)}>Remove</button>
