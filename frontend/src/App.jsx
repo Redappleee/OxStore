@@ -1,7 +1,58 @@
-import {useEffect,useState} from 'react';import {BrowserRouter,Routes,Route,Navigate,useNavigate} from 'react-router-dom';import {loadStripe} from '@stripe/stripe-js';import {Elements} from '@stripe/react-stripe-js';import api,{setAccessToken} from './api';import {CartProvider} from './context/CartContext';import {WishlistProvider} from './context/WishlistContext';import Navbar from './components/Navbar';import Home from './pages/Home';import Shop from './pages/Shop';import ProductDetail from './pages/ProductDetail';import CartPage from './pages/CartPage';import Checkout from './pages/Checkout';import Wishlist from './pages/Wishlist';import Orders from './pages/Orders';import Profile from './pages/Profile';import {Login,Register,Forgot,Reset} from './pages/Auth';import AdminDashboard from './pages/AdminDashboard';import ProductManager from './pages/ProductManager';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import api, { setAccessToken, setUserSession } from './api';
+import {CartProvider} from './context/CartContext';
+import {WishlistProvider} from './context/WishlistContext';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Shop from './pages/Shop';
+import ProductDetail from './pages/ProductDetail';
+import CartPage from './pages/CartPage';
+import Checkout from './pages/Checkout';
+import Wishlist from './pages/Wishlist';
+import Orders from './pages/Orders';
+import Profile from './pages/Profile';
+import {Login,Register,Forgot,Reset} from './pages/Auth';
+import AdminDashboard from './pages/AdminDashboard';
+import ProductManager from './pages/ProductManager';
 import CouponManager from './pages/CouponManager';
+
 const stripe=loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY||'pk_test_replace_me');
 const Protected=({user,children,admin=false})=>user&&( !admin||user.role==='admin')?children:<Navigate to="/login" replace/>;
-export default function App(){const [user,setUser]=useState(null),[ready,setReady]=useState(false);useEffect(()=>{api.post('/auth/refresh').then(({data})=>{setAccessToken(data.accessToken);setUser(data.user)}).catch(()=>{}).finally(()=>setReady(true))},[]);if(!ready)return <div className="loader">OXSTORE</div>;return <BrowserRouter><CartProvider><WishlistProvider><Navbar user={user} setUser={setUser}/><Routes><Route path="/" element={<Home/>}/><Route path="/shop" element={<Shop/>}/><Route path="/product/:id" element={<ProductDetail user={user}/>}/><Route path="/cart" element={<CartPage/>}/><Route path="/wishlist" element={<Protected user={user}><Wishlist/></Protected>}/><Route path="/checkout" element={<Protected user={user}><Elements stripe={stripe}><Checkout/></Elements></Protected>}/><Route path="/orders" element={<Protected user={user}><Orders/></Protected>}/><Route path="/profile" element={<Protected user={user}><Profile user={user} setUser={setUser}/></Protected>}/><Route path="/login" element={<Login setUser={setUser}/>}/><Route path="/register" element={<Register/>}/><Route path="/forgot-password" element={<Forgot/>}/><Route path="/reset-password/:token" element={<Reset/>}/><Route path="/verify-email/:token" element={<Verify/>}/><Route path="/auth/callback" element={<OAuthCallback setUser={setUser}/>}/><Route path="/admin" element={<Protected user={user} admin><AdminDashboard/></Protected>}/><Route path="/admin/products" element={<Protected user={user} admin><ProductManager/></Protected>}/><Route path="/admin/coupons" element={<Protected user={user} admin><CouponManager/></Protected>}/></Routes><footer>© 2026 OXSTORE <span>Modern essentials, considered.</span></footer></WishlistProvider></CartProvider></BrowserRouter>}
+
+export default function App(){
+  const [user,setUser]=useState(()=>{
+    try{ return JSON.parse(localStorage.getItem('oxstore_user')||'null'); }catch{ return null; }
+  });
+  const [ready,setReady]=useState(false);
+
+  useEffect(()=>{
+    // Restore and verify user session on page load/refresh
+    const verifySession = async () => {
+      try {
+        const { data } = await api.get('/auth/me');
+        setUser(data.user);
+        setUserSession(data.user);
+      } catch {
+        try {
+          const { data } = await api.post('/auth/refresh');
+          setAccessToken(data.accessToken);
+          setUser(data.user);
+          setUserSession(data.user);
+        } catch {
+          setUser(null);
+          setAccessToken(null);
+          setUserSession(null);
+        }
+      } finally {
+        setReady(true);
+      }
+    };
+    verifySession();
+  },[]);
+
+  if(!ready)return <div className="loader">OXSTORE</div>;return <BrowserRouter><CartProvider><WishlistProvider><Navbar user={user} setUser={setUser}/><Routes><Route path="/" element={<Home/>}/><Route path="/shop" element={<Shop/>}/><Route path="/product/:id" element={<ProductDetail user={user}/>}/><Route path="/cart" element={<CartPage/>}/><Route path="/wishlist" element={<Protected user={user}><Wishlist/></Protected>}/><Route path="/checkout" element={<Protected user={user}><Elements stripe={stripe}><Checkout/></Elements></Protected>}/><Route path="/orders" element={<Protected user={user}><Orders/></Protected>}/><Route path="/profile" element={<Protected user={user}><Profile user={user} setUser={setUser}/></Protected>}/><Route path="/login" element={<Login setUser={setUser}/>}/><Route path="/register" element={<Register/>}/><Route path="/forgot-password" element={<Forgot/>}/><Route path="/reset-password/:token" element={<Reset/>}/><Route path="/verify-email/:token" element={<Verify/>}/><Route path="/auth/callback" element={<OAuthCallback setUser={setUser}/>}/><Route path="/admin" element={<Protected user={user} admin><AdminDashboard/></Protected>}/><Route path="/admin/products" element={<Protected user={user} admin><ProductManager/></Protected>}/><Route path="/admin/coupons" element={<Protected user={user} admin><CouponManager/></Protected>}/></Routes><footer>© 2026 OXSTORE <span>Modern essentials, considered.</span></footer></WishlistProvider></CartProvider></BrowserRouter>}
 function Verify(){const [m,setM]=useState('Verifying your email…');useEffect(()=>{const token=window.location.pathname.split('/').pop();api.get(`/auth/verify-email/${token}`).then(r=>setM(r.data.message)).catch(e=>setM(e.response?.data?.message||'Verification failed'))},[]);return <main className="auth"><h1>{m}</h1></main>}
-function OAuthCallback({setUser}){const nav=useNavigate();useEffect(()=>{const p=new URLSearchParams(window.location.search);const token=p.get('token');if(!token){nav('/login');return;}setAccessToken(token);setUser({id:p.get('id'),name:p.get('name'),email:p.get('email'),role:p.get('role'),avatar:p.get('avatar')||''});nav('/')},[]);return <div className="loader">OXSTORE</div>}
+function OAuthCallback({setUser}){const nav=useNavigate();useEffect(()=>{const p=new URLSearchParams(window.location.search);const token=p.get('token');if(!token){nav('/login');return;}setAccessToken(token);const u={id:p.get('id'),name:p.get('name'),email:p.get('email'),role:p.get('role'),avatar:p.get('avatar')||''};setUserSession(u);setUser(u);nav('/')},[]);return <div className="loader">OXSTORE</div>}

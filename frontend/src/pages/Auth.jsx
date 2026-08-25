@@ -1,4 +1,4 @@
-import {useState} from 'react';import {Link,useNavigate,useParams} from 'react-router-dom';import api,{setAccessToken} from '../api';
+import {useState} from 'react';import {Link,useNavigate,useParams} from 'react-router-dom';import api,{setAccessToken,setUserSession} from '../api';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
@@ -39,7 +39,7 @@ function Divider(){
 
 export function Login({setUser}){
   const [form,setForm]=useState({email:'',password:''}),[message,setMessage]=useState(''),nav=useNavigate();
-  const submit=async e=>{e.preventDefault();try{const {data}=await api.post('/auth/login',form);setAccessToken(data.accessToken);setUser(data.user);nav('/')}catch(e){setMessage(e.response?.data?.message||'Could not sign in')}};
+  const submit=async e=>{e.preventDefault();try{const {data}=await api.post('/auth/login',form);setAccessToken(data.accessToken);setUserSession(data.user);setUser(data.user);nav('/')}catch(e){setMessage(e.response?.data?.message||'Could not sign in')}};
   const resend=async()=>{if(!form.email)return setMessage('Enter your email address first.');try{setMessage((await api.post('/auth/resend-verification',{email:form.email})).data.message)}catch{setMessage('Unable to resend verification email.')}};
   return (
     <Auth title="Welcome back">

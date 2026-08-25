@@ -1,5 +1,6 @@
 const router=require('express').Router(),crypto=require('crypto'),passport=require('passport'),GoogleStrategy=require('passport-google-oauth20').Strategy,User=require('../models/User'),cloudinary=require('../config/cloudinary'),upload=require('../middleware/upload'),{accessToken,randomToken,hashToken,refreshExpiry}=require('../utils/tokens'),{sendMail}=require('../config/mailer'),{protect}=require('../middleware/auth');
-const cookie=(res,token)=>res.cookie('refreshToken',token,{httpOnly:true,secure:process.env.COOKIE_SECURE==='true',sameSite:'lax',path:'/api/auth',maxAge:Number(process.env.REFRESH_TOKEN_DAYS||7)*864e5});
+const isProd=process.env.NODE_ENV==='production';
+const cookie=(res,token)=>res.cookie('refreshToken',token,{httpOnly:true,secure:isProd||process.env.COOKIE_SECURE==='true',sameSite:isProd?'none':'lax',path:'/api/auth',maxAge:Number(process.env.REFRESH_TOKEN_DAYS||7)*864e5});
 async function issue(res,user){const raw=randomToken();user.refreshTokens.push({tokenHash:hashToken(raw),expiresAt:refreshExpiry()});await user.save();cookie(res,raw);return accessToken(user)}
 const url=(path,token)=>`${process.env.CLIENT_URL}${path}/${token}`;
 router.post('/register',async(req,res)=>{const {name,email,password}=req.body;if(!name||!email||!password)return res.status(400).json({message:'Name, email and password are required'});if(await User.exists({email}))return res.status(409).json({message:'Email is already registered'});const raw=randomToken(),user=await User.create({name,email,password,verificationTokenHash:hashToken(raw),verificationTokenExpires:new Date(Date.now()+864e5)});sendMail({to:user.email,subject:'Verify your OxStore email',html:`<p>Welcome to OxStore. <a href="${url('/verify-email',raw)}">Verify your email</a>.</p>`}).catch(console.error);res.status(201).json({message:'Account created. Check your email to verify it.'})});
@@ -39,7 +40,7 @@ router.get('/google/callback',passport.authenticate('google',{session:false,fail
   user.refreshTokens.push({tokenHash:hashToken(raw),expiresAt:refreshExpiry()});
   await user.save();
   const at=accessToken(user);
-  res.cookie('refreshToken',raw,{httpOnly:true,secure:process.env.COOKIE_SECURE==='true',sameSite:'lax',path:'/api/auth',maxAge:Number(process.env.REFRESH_TOKEN_DAYS||7)*864e5});
+  cookie(res,raw);
   res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${at}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&id=${user.id}&role=${user.role}&avatar=${encodeURIComponent(user.avatar||'')}`);
 });
 router.get('/me',protect,(req,res)=>res.json({user:{id:req.user.id,name:req.user.name,email:req.user.email,phone:req.user.phone||'',avatar:req.user.avatar||'',role:req.user.role,isVerified:req.user.isVerified,createdAt:req.user.createdAt,sessionCount:req.user.refreshTokens?.length||0}}));

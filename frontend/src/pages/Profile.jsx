@@ -477,8 +477,9 @@ export default function Profile({ user, setUser }) {
 
   const logout = async () => {
     try { await api.post('/auth/logout'); } catch {}
-    const { setAccessToken } = await import('../api');
+    const { setAccessToken, setUserSession } = await import('../api');
     setAccessToken(null);
+    setUserSession(null);
     setUser(null);
     nav('/');
   };
