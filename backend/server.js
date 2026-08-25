@@ -35,6 +35,13 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   connect().catch(e => console.error('MongoDB connection error:', e));
 });
 
+server.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is busy. Exiting for clean restart.`);
+    process.exit(1);
+  }
+});
+
 process.on('SIGTERM', () => {
   console.log('SIGTERM received. Graceful shutdown.');
   server.close(() => process.exit(0));
