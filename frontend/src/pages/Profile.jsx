@@ -240,6 +240,11 @@ function TabOrders() {
                       <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{i.name}</p>
                       <p style={{ ...S.muted, margin: '2px 0' }}>{[i.size, i.color].filter(Boolean).join(' · ')} × {i.quantity}</p>
                       <p style={{ margin: 0, fontSize: 13 }}>{inr(i.price)}</p>
+                      {o.status === 'delivered' && (i.product || i._id) && (
+                        <Link to={`/product/${i.product || i._id}`} style={{ fontSize: 12, color: '#c8952a', fontWeight: 600, textDecoration: 'underline', marginTop: 6, display: 'inline-block' }}>
+                          ★ Write Client Note →
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}

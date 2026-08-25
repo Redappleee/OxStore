@@ -81,13 +81,23 @@ export default function Reviews({ productId, user }) {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [eligibility, setEligibility] = useState({ canReview: false, hasDelivered: false, hasReviewed: false });
 
   const load = () =>
     api.get(`/reviews/product/${productId}`)
       .then(r => setReviews(r.data.reviews))
       .catch(() => {});
 
-  useEffect(() => { load(); }, [productId]);
+  useEffect(() => {
+    load();
+    if (user) {
+      api.get(`/reviews/eligibility/${productId}`)
+        .then(r => setEligibility(r.data))
+        .catch(() => setEligibility({ canReview: false, hasDelivered: false, hasReviewed: false }));
+    } else {
+      setEligibility({ canReview: false, hasDelivered: false, hasReviewed: false });
+    }
+  }, [productId, user]);
 
   const submit = async e => {
     e.preventDefault();
@@ -97,6 +107,7 @@ export default function Reviews({ productId, user }) {
       setSuccess(true);
       setMessage('Thank you for your review.');
       setForm({ rating: 5, comment: '' });
+      setEligibility(e => ({ ...e, canReview: false, hasReviewed: true }));
       load();
     } catch (e) {
       setSuccess(false);
@@ -116,55 +127,83 @@ export default function Reviews({ productId, user }) {
       {/* Header */}
       <div style={S.header}>
         <h2 style={S.heading}>Client Notes</h2>
-        <span style={S.mono}>Verified purchases · Honest opinions</span>
+        <span style={S.mono}>Verified purchases · Delivered orders only</span>
       </div>
 
       {/* Rating summary */}
       <RatingSummary reviews={reviews} />
 
-      {/* Write review form */}
-      {user && (
-        <div style={S.formCard}>
-          <p style={S.formTitle}>Share your experience</p>
-          <form onSubmit={submit}>
-            {/* Star picker */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={S.fieldLabel}>Your rating</label>
-              <StarRow
-                value={form.rating}
-                interactive
-                onPick={n => setForm(f => ({ ...f, rating: n }))}
-                size={28}
-              />
-            </div>
+      {/* Write review form / Eligibility note */}
+      {user ? (
+        eligibility.hasReviewed ? (
+          <div style={{ ...S.formCard, background: '#e8f5e9', border: '1px solid #c8e6c9', color: '#2e7d32' }}>
+            <p style={{ margin: 0, fontWeight: 500, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>✓</span> You have reviewed this piece. Thank you for your verified feedback!
+            </p>
+          </div>
+        ) : eligibility.canReview ? (
+          <div style={S.formCard}>
+            <p style={S.formTitle}>Share your experience (Verified Order Delivered)</p>
+            <form onSubmit={submit}>
+              {/* Star picker */}
+              <div style={{ marginBottom: 18 }}>
+                <label style={S.fieldLabel}>Your rating</label>
+                <StarRow
+                  value={form.rating}
+                  interactive
+                  onPick={n => setForm(f => ({ ...f, rating: n }))}
+                  size={28}
+                />
+              </div>
 
-            {/* Comment */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={S.fieldLabel}>Your review</label>
-              <textarea
-                value={form.comment}
-                onChange={e => setForm(f => ({ ...f, comment: e.target.value }))}
-                required
-                rows={4}
-                placeholder="What did you love? How does it fit? Any tips for others…"
-                style={S.textarea}
-              />
-            </div>
+              {/* Comment */}
+              <div style={{ marginBottom: 18 }}>
+                <label style={S.fieldLabel}>Your review</label>
+                <textarea
+                  value={form.comment}
+                  onChange={e => setForm(f => ({ ...f, comment: e.target.value }))}
+                  required
+                  rows={4}
+                  placeholder="What did you love? How does it fit? Any tips for others…"
+                  style={S.textarea}
+                />
+              </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-              <button
-                className="button"
-                disabled={submitting}
-                style={{ minWidth: 160 }}>
-                {submitting ? 'Posting…' : 'Post review'}
-              </button>
-              {message && (
-                <span style={{ fontSize: 13, color: success ? '#2e7d32' : '#c0392b' }}>
-                  {success ? '✓ ' : ''}{message}
-                </span>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <button
+                  className="button"
+                  disabled={submitting}
+                  style={{ minWidth: 160 }}>
+                  {submitting ? 'Posting…' : 'Post review'}
+                </button>
+                {message && (
+                  <span style={{ fontSize: 13, color: success ? '#2e7d32' : '#c0392b' }}>
+                    {success ? '✓ ' : ''}{message}
+                  </span>
+                )}
+              </div>
+            </form>
+          </div>
+        ) : (
+          <div style={{ ...S.formCard, background: '#f7f5f1', border: '1px solid var(--line)', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <span style={{ fontSize: 14 }}>🔒</span>
+              <strong style={{ fontSize: 13, color: 'var(--ink)' }}>Verified Buyers Only</strong>
             </div>
-          </form>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+              Only customers with a <strong>delivered order</strong> for this product can leave a review. Reviews unlock automatically once your order status is updated to Delivered.
+            </p>
+          </div>
+        )
+      ) : (
+        <div style={{ ...S.formCard, background: '#f7f5f1', border: '1px solid var(--line)', padding: '20px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 14 }}>🔒</span>
+            <strong style={{ fontSize: 13, color: 'var(--ink)' }}>Verified Buyers Only</strong>
+          </div>
+          <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+            Only customers with a <strong>delivered order</strong> for this product can leave a review. Sign in with the account you used to order this item once delivered to post feedback.
+          </p>
         </div>
       )}
 
