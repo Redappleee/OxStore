@@ -17,7 +17,9 @@ const routes=[
   ['/reviews',require('./routes/reviews')],
   ['/orders',require('./routes/orders')],
   ['/payments',require('./routes/payments').router],
-  ['/admin',require('./routes/admin')]
+  ['/admin',require('./routes/admin')],
+  ['/coupons',require('./routes/coupons')],
+  ['/settings',require('./routes/settings')]
 ];
 
 routes.forEach(([path,router])=>{
