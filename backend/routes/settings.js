@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Settings = require('../models/Settings');
-const { protect, adminOnly } = require('../middleware/auth');
+const { protect, admin } = require('../middleware/auth');
 
 // Get announcements (Public)
 router.get('/announcements', async (req, res) => {
@@ -12,7 +12,7 @@ router.get('/announcements', async (req, res) => {
 });
 
 // Update announcements (Admin)
-router.put('/announcements', protect, adminOnly, async (req, res) => {
+router.put('/announcements', protect, admin, async (req, res) => {
   const { announcements } = req.body;
   if (!Array.isArray(announcements)) {
     return res.status(400).json({ message: 'Announcements must be an array of text messages.' });

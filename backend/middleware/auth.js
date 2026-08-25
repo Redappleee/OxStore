@@ -1,3 +1,4 @@
 const jwt=require('jsonwebtoken'),User=require('../models/User');
 exports.protect=async(req,res,next)=>{const header=req.headers.authorization; if(!header?.startsWith('Bearer ')) return res.status(401).json({message:'Authentication required'}); try{const data=jwt.verify(header.slice(7),process.env.JWT_ACCESS_SECRET);req.user=await User.findById(data.sub);if(!req.user)return res.status(401).json({message:'User unavailable'});next()}catch(e){res.status(401).json({message:'Invalid or expired access token'})}};
 exports.admin=(req,res,next)=>req.user?.role==='admin'?next():res.status(403).json({message:'Administrator access required'});
+exports.adminOnly=exports.admin;
