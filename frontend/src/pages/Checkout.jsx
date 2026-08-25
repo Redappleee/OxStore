@@ -97,7 +97,28 @@ export default function Checkout(){
         description: `Order ${order._id.slice(-7).toUpperCase()}`,
         order_id: data.gatewayOrder.id,
         prefill: { name: address.name },
-        theme: { color: '#30372c' },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: 'Pay via UPI / QR Code (GPay, PhonePe, Paytm, BHIM)',
+                instruments: [
+                  { method: 'upi' }
+                ]
+              },
+              other: {
+                name: 'Cards, NetBanking & Wallets',
+                instruments: [
+                  { method: 'card' },
+                  { method: 'netbanking' },
+                  { method: 'wallet' }
+                ]
+              }
+            },
+            sequence: ['block.upi', 'block.other']
+          }
+        },
+        theme: { color: '#171513' },
         handler: async (response) => {
           try {
             await api.post('/payments/razorpay/verify', { orderId: order._id, ...response });
@@ -137,7 +158,7 @@ export default function Checkout(){
           <h2>Payment</h2>
           <div className="payment-options">
             <button type="button" className={method === 'stripe' ? 'selected' : ''} onClick={() => setMethod('stripe')}>Card / Stripe</button>
-            <button type="button" className={method === 'razorpay' ? 'selected' : ''} onClick={() => setMethod('razorpay')}>Razorpay</button>
+            <button type="button" className={method === 'razorpay' ? 'selected' : ''} onClick={() => setMethod('razorpay')}>UPI / Razorpay</button>
           </div>
 
           {method === 'stripe' ? (
@@ -145,7 +166,15 @@ export default function Checkout(){
               <CardElement options={{ style: { base: { fontSize: '16px', color: '#181614', '::placeholder': { color: '#958f88' } } } }} />
             </div>
           ) : (
-            <p className="gateway-note">Razorpay opens a secure payment window for UPI, cards, netbanking and wallets.</p>
+            <div className="gateway-note" style={{ padding: 16, background: '#f7f5f1', border: '1px solid var(--line)', margin: '14px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>UPI & QR Code Enabled</span>
+                <span style={{ fontSize: 10, fontFamily: 'DM Mono, monospace', background: '#171513', color: '#fff', padding: '2px 6px', borderRadius: 2 }}>INSTANT</span>
+              </div>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+                Razorpay will open a secure window. You can scan the <strong>QR Code</strong> with any UPI app (GPay, PhonePe, Paytm, BHIM) or enter your UPI ID, as well as cards & netbanking.
+              </p>
+            </div>
           )}
 
           {/* ── Promo Code Card ── */}
