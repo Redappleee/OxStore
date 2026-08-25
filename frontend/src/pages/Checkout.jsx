@@ -90,7 +90,7 @@ export default function Checkout(){
       await loadRazorpay();
       const { data } = await api.post('/payments/razorpay/order', { orderId: order._id });
       const checkout = new window.Razorpay({
-        key: data.keyId,
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID || data.keyId,
         amount: data.gatewayOrder.amount,
         currency: data.gatewayOrder.currency,
         name: 'OxStore',
