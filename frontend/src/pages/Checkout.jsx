@@ -74,8 +74,17 @@ export default function Checkout(){
     e.preventDefault();
     if (!items.length || (method === 'stripe' && !stripe)) return;
     try {
-      setMessage('Creating your secure payment…');
-      const { data: { order } } = await api.post('/orders', { shippingAddress: address, couponCode: appliedCoupon?.code });
+      const payloadItems = items.map(i => ({
+        product: i.product?._id || i.product,
+        quantity: i.quantity,
+        size: i.size,
+        color: i.color
+      }));
+      const { data: { order } } = await api.post('/orders', {
+        shippingAddress: address,
+        couponCode: appliedCoupon?.code,
+        items: payloadItems
+      });
       
       if (method === 'stripe') {
         const { data: { clientSecret } } = await api.post('/payments/intent', { orderId: order._id });
