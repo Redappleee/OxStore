@@ -398,6 +398,23 @@ function TabSecurity({ user, setUser }) {
     } finally { setBusy(false); }
   };
 
+  const [verifyMsg, setVerifyMsg] = useState({ text: '', ok: false });
+  const [busyVerify, setBusyVerify] = useState(false);
+
+  const resendVerify = async () => {
+    if (!user?.email) return;
+    setBusyVerify(true);
+    setVerifyMsg({ text: '', ok: false });
+    try {
+      const { data } = await api.post('/auth/resend-verification', { email: user.email });
+      setVerifyMsg({ text: data.message || 'Verification email sent. Please check your inbox.', ok: true });
+    } catch (e) {
+      setVerifyMsg({ text: e.response?.data?.message || 'Unable to send verification email.', ok: false });
+    } finally {
+      setBusyVerify(false);
+    }
+  };
+
   return (
     <div>
       <h2 style={S.tabTitle}>Security</h2>
@@ -412,15 +429,41 @@ function TabSecurity({ user, setUser }) {
         {signOutMsg && <p style={{ ...S.muted, fontSize: 12, gridColumn: '1/-1', marginTop: 4 }}>{signOutMsg}</p>}
       </div>
 
-      {/* Account verification badge */}
+      {/* Account verification badge & action */}
       <div className="profile-sec-card" style={{ ...S.secCard, marginTop: 12 }}>
         <div>
           <p style={{ margin: 0, fontWeight: 600 }}>Email verification</p>
           <p style={{ ...S.muted, margin: '4px 0 0', fontSize: 13 }}>
-            {user?.isVerified ? 'Your email address is verified.' : 'Your email address requires verification.'}
+            {user?.isVerified ? 'Your email address is verified.' : 'Your email address is currently unverified.'}
           </p>
+          {verifyMsg.text && (
+            <p style={{ fontSize: 12, margin: '8px 0 0', color: verifyMsg.ok ? '#2e7d32' : '#c0392b', fontWeight: 500 }}>
+              {verifyMsg.ok ? '✓ ' : ''}{verifyMsg.text}
+            </p>
+          )}
         </div>
-        <span style={S.statusTag}>{user?.isVerified ? 'VERIFIED' : 'UNVERIFIED'}</span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{
+            ...S.statusTag,
+            background: user?.isVerified ? '#e8f5e9' : '#fff3e0',
+            color: user?.isVerified ? '#2e7d32' : '#e65100',
+            border: `1px solid ${user?.isVerified ? '#c8e6c9' : '#ffe0b2'}`
+          }}>
+            {user?.isVerified ? 'VERIFIED ✓' : 'UNVERIFIED'}
+          </span>
+
+          {!user?.isVerified && (
+            <button
+              className="button"
+              onClick={resendVerify}
+              disabled={busyVerify}
+              style={{ padding: '8px 14px', fontSize: 12, whiteSpace: 'nowrap' }}
+            >
+              {busyVerify ? 'Sending…' : 'Verify Email'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Member since */}
