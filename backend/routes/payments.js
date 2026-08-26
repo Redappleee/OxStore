@@ -75,7 +75,9 @@ router.post('/razorpay/order', protect, async (req, res) => {
     });
   } catch (e) {
     console.error('Razorpay order error:', e);
-    res.status(500).json({ message: e.message || 'Razorpay order creation failed' });
+    const errorMsg = e.error?.description || e.description || e.message || 'Razorpay order creation failed';
+    const status = e.statusCode || 500;
+    res.status(status).json({ message: `Razorpay Error: ${errorMsg}` });
   }
 });
 
