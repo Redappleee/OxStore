@@ -118,4 +118,48 @@ router.post('/razorpay/verify', protect, async (req, res) => {
   }
 });
 
-module.exports = { router, webhook: router };
+const stripeWebhook = async (req, res) => {
+  try {
+    const event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET);
+    if (event.type === 'payment_intent.succeeded') {
+      const id = event.data.object.metadata.orderId;
+      await Order.findByIdAndUpdate(id, { paymentStatus: 'paid', status: 'confirmed', $push: { timeline: { status: 'confirmed', note: 'Payment received' } } });
+    }
+    if (event.type === 'payment_intent.payment_failed') {
+      await Order.findOneAndUpdate({ paymentIntentId: event.data.object.id }, { paymentStatus: 'failed' });
+    }
+    res.json({ received: true });
+  } catch (e) {
+    console.error('Stripe webhook error:', e);
+    res.status(400).send(`Webhook error: ${e.message}`);
+  }
+};
+
+const razorpayWebhook = async (req, res) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!signature || !secret) return res.status(400).json({ message: 'Invalid Razorpay webhook' });
+    const expected = crypto.createHmac('sha256', secret).update(req.body).digest('hex');
+    if (expected.length !== signature.length || !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))) {
+      return res.status(400).json({ message: 'Invalid Razorpay webhook signature' });
+    }
+    const event = JSON.parse(req.body.toString('utf8'));
+    if (['payment.captured', 'order.paid'].includes(event.event)) {
+      const payment = event.payload.payment?.entity;
+      const razorpayOrderId = payment?.order_id || event.payload.order?.entity?.id;
+      if (razorpayOrderId) {
+        await Order.findOneAndUpdate(
+          { razorpayOrderId, paymentStatus: { $ne: 'paid' } },
+          { paymentStatus: 'paid', status: 'confirmed', razorpayPaymentId: payment?.id, $push: { timeline: { status: 'confirmed', note: 'Razorpay webhook confirmed payment' } } }
+        );
+      }
+    }
+    res.json({ received: true });
+  } catch (e) {
+    console.error('Razorpay webhook error:', e);
+    res.status(500).json({ message: e.message || 'Razorpay webhook failed' });
+  }
+};
+
+module.exports = { router, webhook: stripeWebhook, razorpayWebhook };
